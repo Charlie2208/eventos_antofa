@@ -25,7 +25,9 @@ export default {
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;700&display=swap");
 
-#app {
+.app {
   font-family: 'Inter', sans-serif;
+
 }
+
 </style>

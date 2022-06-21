@@ -3,13 +3,16 @@
     <v-row class="py-3">
       <div>
         <v-icon>mdi-calendar</v-icon>
-        <router-link to="/" flat class="mx-2 links_eventosCategorias"
+        <router-link
+          to="/"
+          flat
+          class="mx-2 links_eventosCategorias black--text"
           >Eventos</router-link
         >
       </div>
       <div>
         <v-icon>mdi-scatter-plot</v-icon>
-        <router-link to="/" flat class="links_eventosCategorias"
+        <router-link to="/" flat class="links_eventosCategorias black--text"
           >Categorias</router-link
         >
       </div>
@@ -68,7 +71,8 @@
       <v-col cols="12" md="4" class="d-none d-md-block">
         <!-- <h2 class="font-weight-medium">Lista Antofa Music</h2> -->
         <iframe
-          src="https://open.spotify.com/embed/playlist/4Sim8snGbus9RZ913b2kyM?utm_source=generator"
+          style="border-radius: 12px"
+          src="https://open.spotify.com/embed/playlist/4wCE4XPEIQKvyJ5sPI6UF5?utm_source=generator"
           width="100%"
           height="380"
           frameBorder="0"
@@ -82,6 +86,37 @@
             :title="'Titulo Marcador'"
           />
         </div>
+        <v-card class="mx-auto mt-3" max-width="400">
+    <v-list-item two-line>
+      <v-list-item-content>
+        <v-list-item-title class="text-h5">
+          {{ estacion.Estacion }}
+        </v-list-item-title>
+        <v-list-item-subtitle>Estado: {{estacion.Estado}}</v-list-item-subtitle>
+      </v-list-item-content>
+    </v-list-item>
+
+    <v-card-text>
+      <v-row align="center">
+        <v-col class="text-h2" cols="8"> {{ estacion.Temp }}&deg;C </v-col>
+        <v-col cols="4">
+          <v-img src="https://www.municipalidaddeantofagasta.cl/images/noticias/Logo1.jpeg" alt="Sunny image" width="100%"></v-img>
+        </v-col>
+      </v-row>
+    </v-card-text>
+
+    <v-list-item>
+      <v-list-item-icon>
+        Humedad
+      </v-list-item-icon>
+      <v-list-item-subtitle>{{ estacion.Humedad }}</v-list-item-subtitle>
+    </v-list-item>
+    <v-divider></v-divider>
+    <v-card-actions>
+      <v-btn text> Full Report </v-btn>
+    </v-card-actions>
+  </v-card>
+      
       </v-col>
     </v-row>
   </v-container>
@@ -91,10 +126,19 @@
 import Carousel from "@/components/Carousel.vue";
 import Calendar from "@/components/Calendar.vue";
 import GoogleMap from "@/components/GoogleMap.vue";
+import axios from "axios";
 
 export default {
   name: "Home",
   components: { Carousel, Calendar, GoogleMap },
+  created() {
+    axios
+      .get("https://api.gael.cloud/general/public/clima/SCFA")
+      .then(({ data }) => {
+        this.estacion = data;
+      })
+      .catch((e) => console.log(e));
+  },
   data() {
     return {
       eventos: [
@@ -121,6 +165,7 @@ export default {
             "Día del patrimonio a celebrarse a lo largo del país, en la ciudad de Antofagasta estarán abiertos diversos museos",
         },
       ],
+      estacion: [],
     };
   },
 };
@@ -128,5 +173,6 @@ export default {
 <style>
 .links_eventosCategorias {
   text-decoration: none;
+  color: black;
 }
 </style>

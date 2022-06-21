@@ -5,9 +5,10 @@ import store from './store'
 import vuetify from './plugins/vuetify'
 import * as VueGoogleMaps from "vue2-google-maps";
 
+console.log(process.env.VUE_APP_KEY)
 Vue.use(VueGoogleMaps, {
   load: {
-    key: "AIzaSyAS9n77idZHHUeSiPdYb-867-OZ-eY-0Zg",
+    key: process.env.VUE_APP_KEY,
   },
 });
 

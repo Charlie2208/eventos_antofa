@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-app id="fondo-animado">
     <h1 class="text-center h-1">Iniciar Sesión</h1>
     <v-form v-model="valid" ref="formRegister">
       <v-row justify="center">
@@ -54,7 +54,7 @@
         </v-card>
       </v-dialog>
     </div>
-  </div>
+  </v-app>
 </template>
 
 <script>
@@ -103,3 +103,21 @@ export default {
 //   },
 };
 </script>
+<style>
+
+
+#fondo-animado {
+  background: linear-gradient(45deg,#bcddf8, #ffffff, #4aadff);
+  background-size: 400% 400%;
+  position: relative;
+  animation: cambiar 10s ease-in-out infinite;
+
+}
+
+@keyframes cambiar {
+  0%{background-position: 0 50%;}
+  50%{background-position: 100% 50%;}
+  100%{background-position: 0 50%;}
+}
+
+</style>
