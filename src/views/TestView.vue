@@ -25,12 +25,7 @@
       </v-list-item-icon>
       <v-list-item-subtitle>{{ estacion.Humedad }}</v-list-item-subtitle>
     </v-list-item>
-
-
-
-
     <v-divider></v-divider>
-
     <v-card-actions>
       <v-btn text> Full Report </v-btn>
     </v-card-actions>

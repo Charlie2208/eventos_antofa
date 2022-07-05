@@ -10,11 +10,6 @@
             label="Email"
             :rules="emailRules"
           />
-          <!-- <v-text-field
-            v-model="user.password"
-            label="Password"
-            :rules="passwordRules"
-          /> -->
           <v-text-field
             v-model="user.password"
             :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
@@ -25,11 +20,6 @@
             counter
             @click:append="show1 = !show1"
           ></v-text-field>
-          <!-- <v-text-field
-            v-model="user.passwordRepit"
-            label="Repit Password"
-            :rules="passwordRepitRules"
-          /> -->
           <v-text-field
             v-model="user.passwordRepit"
             :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
@@ -55,8 +45,8 @@
 </template>
 
 <script>
-// import { createUserWithEmailAndPassword } from "firebase/auth";
-// import { auth } from "../firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 
 export default {
   data() {
@@ -88,25 +78,25 @@ export default {
       ],
     };
   },
-//   methods: {
-//     async registrarUser() {
-//       try {
-//         const userCredential = await createUserWithEmailAndPassword(
-//           auth,
-//           this.user.email,
-//           this.user.password
-//         );
-//         this.$router.push({ name: 'login' })
-//         console.log(userCredential);
-//       } catch (error) {
-//         console.log(error);
-//       }
-//     },
-//     reset() {
-//       console.log("reset...");
-//       this.$refs.formRegister.reset();
-//     },
-//   },
+  methods: {
+    async registrarUser() {
+      try {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          this.user.email,
+          this.user.password
+        );
+        this.$router.push({ name: 'login' })
+        console.log(userCredential);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    reset() {
+      console.log("reset...");
+      this.$refs.formRegister.reset();
+    },
+  },
 };
 </script>
 

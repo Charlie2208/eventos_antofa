@@ -11,6 +11,8 @@
 <script>
 import NavBar from "@/components/NavBar.vue";
 import Footer from "@/components/Footer.vue";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "./firebase";
 
 export default {
   name: "App",
@@ -20,6 +22,18 @@ export default {
   data: () => ({
     //
   }),
+  created() {
+    onAuthStateChanged(auth, (user) => {
+      console.log(user);
+      this.user = user;
+    });
+  },
+  methods: {
+    async cerrarSesion() {
+      await signOut(auth);
+      this.$router.push("/login")
+    },
+  },
 };
 </script>
 <style>

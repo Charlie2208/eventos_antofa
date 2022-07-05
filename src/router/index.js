@@ -3,7 +3,10 @@ import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
+import AgregarEventosView from '../views/AgregarEventosView.vue'
+import AdministracionView from '../views/AdministracionView.vue'
 import TestView from '../views/TestView.vue'
+
 
 Vue.use(VueRouter)
 
@@ -14,6 +17,11 @@ const routes = [
     component: HomeView
   },
   {
+    path: '/miseventos',
+    name: 'miseventos',
+    component: AdministracionView
+  },
+  {
     path: '/login',
     name: 'login',
     component: LoginView
@@ -22,6 +30,11 @@ const routes = [
     path: '/register',
     name: 'register',
     component: RegisterView
+  },
+  {
+    path: '/agregareventos',
+    name: 'agregareventos',
+    component: AgregarEventosView
   },
   {
     path: '/test',

@@ -58,8 +58,8 @@
 </template>
 
 <script>
-// import { auth } from "@/firebase";
-// import { signInWithEmailAndPassword } from "@firebase/auth";
+import { auth } from "@/firebase";
+import { signInWithEmailAndPassword } from "@firebase/auth";
 
 export default {
   data() {
@@ -84,23 +84,23 @@ export default {
       ],
     };
   },
-//   methods: {
-//     loginUser() {
-//       signInWithEmailAndPassword(auth, this.user.email, this.user.password)
-//         .then((userCredential) => {
-//           console.log(userCredential);
-//           this.$router.push({ name: 'crud' })
-//         })
-//         .catch((error) => {
-//           console.log(error);
-//           this.dialog = true;
-//         });
-//     },
-//     reset() {
-//       console.log("reset...");
-//       this.$refs.formRegister.reset();
-//     },
-//   },
+  methods: {
+    loginUser() {
+      signInWithEmailAndPassword(auth, this.user.email, this.user.password)
+        .then((userCredential) => {
+          console.log(userCredential);
+          this.$router.push({ name: 'home' })
+        })
+        .catch((error) => {
+          console.log(error);
+          this.dialog = true;
+        });
+    },
+    reset() {
+      console.log("reset...");
+      this.$refs.formRegister.reset();
+    },
+  },
 };
 </script>
 <style>

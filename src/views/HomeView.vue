@@ -2,15 +2,6 @@
   <v-container>
     <v-row class="py-3">
       <div>
-        <v-icon>mdi-calendar</v-icon>
-        <router-link
-          to="/"
-          flat
-          class="mx-2 links_eventosCategorias black--text"
-          >Eventos</router-link
-        >
-      </div>
-      <div>
         <v-icon>mdi-scatter-plot</v-icon>
         <router-link to="/" flat class="links_eventosCategorias black--text"
           >Categorias</router-link
@@ -24,11 +15,11 @@
     <Carousel />
 
     <v-row align="center" class="py-5">
-      <h1 class="font-weight-medium mx-5">Esta Semana en Antofagasta</h1>
+      <h1 class="font-weight-medium mx-5">Próximos Eventos en Antofagasta</h1>
       <v-btn rounded small color="primary" dark> Ver todo </v-btn>
       <v-spacer></v-spacer>
-      <v-btn color="blue-grey" class="ma-2 white--text">
-        Subir Evento
+      <v-btn color="blue-grey" class="ma-2 white--text" to="/agregareventos">
+        Agregar Evento
         <v-icon right dark> mdi-cloud-upload </v-icon>
       </v-btn>
     </v-row>
@@ -58,6 +49,15 @@
               <v-card-text class="text--primary">
                 <div>{{ evento.descripcion }}</div>
               </v-card-text>
+              <v-card-text class="text--primary">
+                <div>Lugar: {{ evento.lugar }}</div>
+              
+              
+                <div>Dirección: {{ evento.direccion }}</div>
+              
+              
+                <div>Hora: {{ evento.hora }}</div>
+              </v-card-text>
 
               <v-card-actions>
                 <v-btn color="orange" text> Compartir </v-btn>
@@ -72,7 +72,7 @@
         <!-- <h2 class="font-weight-medium">Lista Antofa Music</h2> -->
         <iframe
           style="border-radius: 12px"
-          src="https://open.spotify.com/embed/playlist/4wCE4XPEIQKvyJ5sPI6UF5?utm_source=generator"
+          src="https://open.spotify.com/embed/playlist/4Sim8snGbus9RZ913b2kyM?utm_source=generator&theme=0"
           width="100%"
           height="380"
           frameBorder="0"
@@ -87,36 +87,53 @@
           />
         </div>
         <v-card class="mx-auto mt-3" max-width="400">
-    <v-list-item two-line>
-      <v-list-item-content>
-        <v-list-item-title class="text-h5">
-          {{ estacion.Estacion }}
-        </v-list-item-title>
-        <v-list-item-subtitle>Estado: {{estacion.Estado}}</v-list-item-subtitle>
-      </v-list-item-content>
-    </v-list-item>
+          <v-list-item two-line>
+            <v-list-item-content>
+              <v-list-item-title class="text-h5">
+                {{ estacion.Estacion }}
+              </v-list-item-title>
+              <v-list-item-subtitle
+                >Estado: {{ estacion.Estado }}</v-list-item-subtitle
+              >
+            </v-list-item-content>
+          </v-list-item>
 
-    <v-card-text>
-      <v-row align="center">
-        <v-col class="text-h2" cols="8"> {{ estacion.Temp }}&deg;C </v-col>
-        <v-col cols="4">
-          <v-img src="https://www.municipalidaddeantofagasta.cl/images/noticias/Logo1.jpeg" alt="Sunny image" width="100%"></v-img>
-        </v-col>
-      </v-row>
-    </v-card-text>
+          <v-card-text>
+            <v-row align="center">
+              <v-col class="text-h2" cols="8">
+                {{ estacion.Temp }}&deg;C
+              </v-col>
+              <v-col cols="4">
+                <v-img
+                  v-if="
+                    estacion.Estado === 'Nublado' ||
+                    estacion.Estado === 'Escasa nubosidad' || 
+                    estacion.Estado === 'Nubosidad parcial' ||
+                    estacion.Estado === 'Cubierto'
+                  "
+                  src="https://cdn-icons-png.flaticon.com/512/1140/1140045.png"
+                  alt="Sunny image"
+                  width="100%"
+                ></v-img>
+                <v-img
+                  v-else
+                  src="https://cdn-icons-png.flaticon.com/512/890/890347.png"
+                  alt="Sunny image"
+                  width="100%"
+                ></v-img>
+              </v-col>
+            </v-row>
+          </v-card-text>
 
-    <v-list-item>
-      <v-list-item-icon>
-        Humedad
-      </v-list-item-icon>
-      <v-list-item-subtitle>{{ estacion.Humedad }}</v-list-item-subtitle>
-    </v-list-item>
-    <v-divider></v-divider>
-    <v-card-actions>
-      <v-btn text> Full Report </v-btn>
-    </v-card-actions>
-  </v-card>
-      
+          <v-list-item>
+            <v-list-item-icon> Humedad </v-list-item-icon>
+            <v-list-item-subtitle>{{ estacion.Humedad }}</v-list-item-subtitle>
+          </v-list-item>
+          <v-divider></v-divider>
+          <v-card-actions>
+            <v-btn text> Full Report </v-btn>
+          </v-card-actions>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>
@@ -127,6 +144,7 @@ import Carousel from "@/components/Carousel.vue";
 import Calendar from "@/components/Calendar.vue";
 import GoogleMap from "@/components/GoogleMap.vue";
 import axios from "axios";
+import { mapActions, mapState } from "vuex";
 
 export default {
   name: "Home",
@@ -138,35 +156,19 @@ export default {
         this.estacion = data;
       })
       .catch((e) => console.log(e));
+      
+      this.get_eventos();
   },
   data() {
     return {
-      eventos: [
-        {
-          nombre: "Obra de teatro",
-          src: "http://culturaantofagasta.cl/wp-content/uploads/2020/01/a-Teatro-Municipal-2.jpg",
-          descripcion: "Obra de teatro a relizarse en el teatro municipal",
-        },
-        {
-          nombre: "Concierto de música",
-          src: "https://finde.latercera.com/wp-content/uploads/2022/04/Zero-Gravity-Ambassadors-3-ok-700x450.jpg",
-          descripcion: "Concierto de Jazz",
-        },
-        {
-          nombre: "Filzic 2022",
-          src: "https://www.diarioantofagasta.cl/wp-content/uploads/2018/04/FILZIC2018_5TA_JORNADA-2.jpg",
-          descripcion:
-            "Feria Internacional del libro 2022 se presentará en el sitio cero del puerto de Antofagasta",
-        },
-        {
-          nombre: "Dia del patrimonio",
-          src: "https://www.registromuseoschile.cl/663/articles-60012_imagen_portada.thumb_i_portada.jpg",
-          descripcion:
-            "Día del patrimonio a celebrarse a lo largo del país, en la ciudad de Antofagasta estarán abiertos diversos museos",
-        },
-      ],
       estacion: [],
     };
+  },
+  methods: {
+    ...mapActions(["get_eventos"])
+  },
+  computed: {
+    ...mapState(["eventos"])
   },
 };
 </script>
