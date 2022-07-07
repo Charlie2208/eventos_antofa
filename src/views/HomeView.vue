@@ -1,24 +1,39 @@
 <template>
   <v-container>
     <v-row class="py-3">
-      <div>
-        <v-icon>mdi-scatter-plot</v-icon>
-        <router-link to="/" flat class="links_eventosCategorias black--text"
-          >Categorias</router-link
-        >
+      <div class="mx-3">
+        <v-menu>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn color="primary" dark v-bind="attrs" v-on="on">
+              Categorias
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item v-for="(item, index) in eventos" :key="index">
+              <router-link
+                :to="`/eventos/${item.categoria}`"
+                flat
+                class="links_eventosCategorias black--text"
+                >{{ item.categoria }}</router-link
+              >
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </div>
       <v-spacer></v-spacer>
       <v-btn icon>
         <v-icon>mdi-magnify</v-icon>
       </v-btn>
     </v-row>
-    <Carousel />
+    <Carousel class="py-3" />
 
     <v-row align="center" class="py-5">
       <h1 class="font-weight-medium mx-5">Próximos Eventos en Antofagasta</h1>
-      <v-btn rounded small color="primary" dark> Ver todo </v-btn>
+      <v-btn rounded small color="primary" dark to="/vertodo" class="mx-2">
+        Ver todo
+      </v-btn>
       <v-spacer></v-spacer>
-      <v-btn color="blue-grey" class="ma-2 white--text" to="/agregareventos">
+      <v-btn color="blue-grey" class="ma-2 white--text" @click="abrirAddEvento">
         Agregar Evento
         <v-icon right dark> mdi-cloud-upload </v-icon>
       </v-btn>
@@ -51,18 +66,17 @@
               </v-card-text>
               <v-card-text class="text--primary">
                 <div>Lugar: {{ evento.lugar }}</div>
-              
-              
+
                 <div>Dirección: {{ evento.direccion }}</div>
-              
-              
+
                 <div>Hora: {{ evento.hora }}</div>
               </v-card-text>
 
               <v-card-actions>
                 <v-btn color="orange" text> Compartir </v-btn>
-
-                <v-btn color="orange" text> Explore </v-btn>
+                <v-btn color="orange" text :to="`/evento/${evento.id}`">
+                  Ver Más
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-col>
@@ -79,13 +93,6 @@
           allowfullscreen=""
           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
         ></iframe>
-        <div>
-          <GoogleMap
-            :latitude="-23.646686"
-            :longitude="-70.396772"
-            :title="'Titulo Marcador'"
-          />
-        </div>
         <v-card class="mx-auto mt-3" max-width="400">
           <v-list-item two-line>
             <v-list-item-content>
@@ -107,7 +114,7 @@
                 <v-img
                   v-if="
                     estacion.Estado === 'Nublado' ||
-                    estacion.Estado === 'Escasa nubosidad' || 
+                    estacion.Estado === 'Escasa nubosidad' ||
                     estacion.Estado === 'Nubosidad parcial' ||
                     estacion.Estado === 'Cubierto'
                   "
@@ -136,19 +143,40 @@
         </v-card>
       </v-col>
     </v-row>
+    <v-dialog v-model="dialog" width="500">
+      <template v-slot:activator="{}"> </template>
+
+      <v-card>
+        <v-card-title class="text-h5 red text-error white--text" dark>
+          ¡¡¡Error!!!
+        </v-card-title>
+
+        <v-card-text>
+          ¡Debes crear una cuenta o iniciar sesión para agregar un evento!
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" text @click="dialog = false"> Aceptar </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
 <script>
 import Carousel from "@/components/Carousel.vue";
-import Calendar from "@/components/Calendar.vue";
 import GoogleMap from "@/components/GoogleMap.vue";
 import axios from "axios";
 import { mapActions, mapState } from "vuex";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase";
 
 export default {
   name: "Home",
-  components: { Carousel, Calendar, GoogleMap },
+  components: { Carousel, GoogleMap },
   created() {
     axios
       .get("https://api.gael.cloud/general/public/clima/SCFA")
@@ -156,19 +184,33 @@ export default {
         this.estacion = data;
       })
       .catch((e) => console.log(e));
-      
-      this.get_eventos();
+
+    this.get_eventos();
+
+    onAuthStateChanged(auth, (user) => {
+      console.log(user);
+      this.user = user;
+    });
   },
   data() {
     return {
       estacion: [],
+      dialog: false,
     };
   },
   methods: {
-    ...mapActions(["get_eventos"])
+    ...mapActions(["get_eventos"]),
+
+    async abrirAddEvento() {
+      if (this.user) {
+        this.$router.push("/agregareventos");
+      } else {
+        this.dialog = true;
+      }
+    },
   },
   computed: {
-    ...mapState(["eventos"])
+    ...mapState(["eventos"]),
   },
 };
 </script>

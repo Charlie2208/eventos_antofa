@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { addDoc, collection, deleteDoc, doc, onSnapshot, query, updateDoc } from '@firebase/firestore';
-import { db } from '../firebase';
+import { auth, db } from '../firebase';
 
 
 Vue.use(Vuex)
@@ -44,7 +44,8 @@ export default new Vuex.Store({
           fecha: evento.fecha,
           hora: evento.hora,
           lugar: evento.lugar,
-          src: evento.src
+          src: evento.src,
+          uid: auth.currentUser.uid,
         });
       } catch (error) {
         console.log(error)

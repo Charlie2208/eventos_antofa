@@ -13,13 +13,13 @@
         <v-spacer></v-spacer>
         <div class="d-none d-md-block">
           <v-btn text to="about" class="white--text">Sobre Nosotros</v-btn>
-          <v-divider vertical></v-divider>
+          
           <v-btn text to="miseventos" class="white--text" v-if="user">Mis Eventos</v-btn>
-          <v-divider vertical v-if="user"></v-divider>
+          
           <v-btn text to="register" class="white--text" v-if="!user">Regístrate</v-btn>
-          <v-divider vertical v-if="!user"></v-divider>
+          
           <v-btn text to="login" class="white--text" v-if="!user">Iniciar Sesión</v-btn>
-          <v-divider vertical v-if="!user"></v-divider>
+          
           <v-btn  @click="cerrarSesion" v-if="user" color="blue" class="white--text">
             Cerrar Sesión<v-icon>mdi-logout</v-icon>
           </v-btn>
@@ -63,11 +63,17 @@
             </v-list-item-icon>
             <v-list-item-title>Agregar Evento</v-list-item-title>
           </v-list-item>
-          <v-list-item v-if="user">
+          <v-list-item v-if="user" @click="cerrarSesion">
             <v-list-item-icon>
               <v-icon>mdi-logout</v-icon>
             </v-list-item-icon>
             <v-list-item-title>Cerrar Sesión</v-list-item-title>
+          </v-list-item>
+          <v-list-item v-if="user" to="miseventos">
+            <v-list-item-icon>
+              <v-icon>mdi-cloud</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>Mis eventos</v-list-item-title>
           </v-list-item>
         </v-list-item-group>
       </v-list>

@@ -74,6 +74,33 @@
         </v-btn>
       </v-container>
     </v-form>
+
+    <v-dialog
+      v-model="dialog"
+      max-width="400"
+    >
+      <v-card>
+        <v-card-title class="text-h5">
+          Evento creado con éxito
+        </v-card-title>
+
+        <v-card-text>
+          Para ver el evento el evento pulsa el botón
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn
+            color="green darken-1"
+            text
+            @click="pushHome"
+          >
+            Cerrar alerta
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
@@ -92,6 +119,7 @@ export default {
         direccion: "",
         hora: "",
       },
+      dialog: false,
       nameRules: [
         (v) => (v && !!v.trim()) || "Escribe algo, no espacios!",
         (v) => !!v || "No existe",
@@ -113,9 +141,14 @@ export default {
       addEventoForm() {
           this.add_evento({ ...this.evento });
           this.evento = {};
+          this.dialog = true;
       },
       reset() {
           this.$refs.formEventos.reset()
+      },
+      pushHome(){
+          this.$router.push("/")
+          this.dialog = false;
       }
   },
   computed: {
@@ -123,6 +156,9 @@ export default {
   },
   created() {
       this.get_eventos();
+  },
+  mounted(){
+      window.scrollTo(0, 0)
   }
 };
 </script>

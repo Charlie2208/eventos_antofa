@@ -35,12 +35,33 @@
             class="mr-2"
             :disabled="!valid"
             @click="registrarUser"
-            >Iniciar Sesión</v-btn
+            >Registrarte</v-btn
           >
           <v-btn color="error" @click="reset">Resetear</v-btn>
         </v-col>
       </v-row>
     </v-form>
+    <v-dialog
+      v-model="dialog"
+      max-width="400"
+    >
+      <v-card>
+        <v-card-title class="text-h5">
+          Registro exitoso
+        </v-card-title>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn
+            color="green darken-1"
+            text
+            @click="pushHome"
+          >
+            Cerrar alerta
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
@@ -52,6 +73,7 @@ export default {
   data() {
     return {
       valid: false,
+      dialog: false,
       user: {
         name: "",
         email: "",
@@ -86,7 +108,7 @@ export default {
           this.user.email,
           this.user.password
         );
-        this.$router.push({ name: 'login' })
+        this.dialog = true;
         console.log(userCredential);
       } catch (error) {
         console.log(error);
@@ -96,6 +118,10 @@ export default {
       console.log("reset...");
       this.$refs.formRegister.reset();
     },
+    pushHome(){
+    this.$router.push({ name: 'home' });
+    this.dialog = false;
+  }
   },
 };
 </script>

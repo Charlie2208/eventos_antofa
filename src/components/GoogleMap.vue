@@ -31,6 +31,7 @@ export default {
     latitude: Number,
     longitude: Number,
     title: String,
+    
   },
 };
 </script>
