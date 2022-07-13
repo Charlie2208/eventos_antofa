@@ -62,6 +62,27 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog
+      v-model="dialogEmailEnUso"
+      max-width="400"
+    >
+      <v-card>
+        <v-card-title class="text-h5">
+          Este Usuario ya existe
+        </v-card-title>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn
+            color="green darken-1"
+            text
+            @click="dialogEmailEnUso = false"
+          >
+            Cerrar alerta
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
@@ -74,6 +95,7 @@ export default {
     return {
       valid: false,
       dialog: false,
+      dialogEmailEnUso: false,
       user: {
         name: "",
         email: "",
@@ -112,6 +134,9 @@ export default {
         console.log(userCredential);
       } catch (error) {
         console.log(error);
+        if (error.code === 'auth/email-already-in-use'){
+          this.dialogEmailEnUso = true
+        }
       }
     },
     reset() {

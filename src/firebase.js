@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore'
+// import { storage } from "firebase/storage";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAnS2f0Fo6-hTmFGFdoWCk5ZDr4fx3g0JA",
@@ -13,6 +14,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+auth.languageCode = 'es';
 const db = getFirestore(app);
 
 const currentUserPromise = () => new Promise((resolve, reject) => {

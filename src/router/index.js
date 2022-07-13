@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import AboutView from '../views/AboutView.vue'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import AgregarEventosView from '../views/AgregarEventosView.vue'
@@ -21,7 +22,7 @@ const routes = [
     component: HomeView
   },
   {
-    path: '/miseventos',
+    path: '/miseventos/:uid',
     name: 'miseventos',
     component: AdministracionView,
     meta: {
@@ -64,11 +65,8 @@ const routes = [
   },
   {
     path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+    name: 'AboutView',
+    component: AboutView
   }
 ]
 
@@ -79,8 +77,6 @@ const router = new VueRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  console.log("entraste al beforEach");
-
   const requireAuth = to.meta.auth
   const user = await currentUserPromise()
 

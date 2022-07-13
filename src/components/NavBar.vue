@@ -11,10 +11,10 @@
           <v-btn text to="/" class="white--text">EventosAntofa</v-btn>
         </v-toolbar-title>
         <v-spacer></v-spacer>
-        <div class="d-none d-md-block">
+        <div class="d-none d-md-block" >
           <v-btn text to="about" class="white--text">Sobre Nosotros</v-btn>
           
-          <v-btn text to="miseventos" class="white--text" v-if="user">Mis Eventos</v-btn>
+          <v-btn text :to="`/miseventos/${user.uid}`" class="white--text" v-if="user">Mis Eventos</v-btn>
           
           <v-btn text to="register" class="white--text" v-if="!user">Regístrate</v-btn>
           
@@ -69,7 +69,7 @@
             </v-list-item-icon>
             <v-list-item-title>Cerrar Sesión</v-list-item-title>
           </v-list-item>
-          <v-list-item v-if="user" to="miseventos">
+          <v-list-item v-if="user" >
             <v-list-item-icon>
               <v-icon>mdi-cloud</v-icon>
             </v-list-item-icon>
@@ -84,6 +84,7 @@
 <script>
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../firebase";
+import { mapState, mapActions } from "vuex";
 export default {
   name: "navbar",
   data: () => ({
@@ -96,12 +97,19 @@ export default {
       console.log(user);
       this.user = user;
     });
+    this.get_eventos();
   },
   methods: {
     async cerrarSesion() {
       await signOut(auth);
       this.$router.push("/login");
     },
+    ...mapActions(["get_eventos"]),
   },
+   computed: {
+    ...mapState(["eventos"]),
+  },
+
+  
 };
 </script>

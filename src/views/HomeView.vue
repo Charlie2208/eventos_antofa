@@ -21,11 +21,17 @@
         </v-menu>
       </div>
       <v-spacer></v-spacer>
-      <v-btn icon>
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
+
+      <v-toolbar flat color="transparent">
+        <v-text-field
+          v-model="texto"
+          append-icon="mdi-magnify"
+          label="Buscar Evento"
+          single-line
+        ></v-text-field>
+      </v-toolbar>
     </v-row>
-    <Carousel class="py-3" />
+    <Carousel class="py-1" />
 
     <v-row align="center" class="py-5">
       <h1 class="font-weight-medium mx-5">Próximos Eventos en Antofagasta</h1>
@@ -45,7 +51,7 @@
             cols="12"
             sm="6"
             md="6"
-            v-for="(evento, i) in eventos"
+            v-for="(evento, i) in filtroEvento"
             :key="i"
           >
             <v-card class="mx-auto" max-width="400">
@@ -68,6 +74,8 @@
                 <div>Lugar: {{ evento.lugar }}</div>
 
                 <div>Dirección: {{ evento.direccion }}</div>
+
+                <div>Fecha: {{ evento.fechaDb }}</div>
 
                 <div>Hora: {{ evento.hora }}</div>
               </v-card-text>
@@ -93,54 +101,7 @@
           allowfullscreen=""
           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
         ></iframe>
-        <v-card class="mx-auto mt-3" max-width="400">
-          <v-list-item two-line>
-            <v-list-item-content>
-              <v-list-item-title class="text-h5">
-                {{ estacion.Estacion }}
-              </v-list-item-title>
-              <v-list-item-subtitle
-                >Estado: {{ estacion.Estado }}</v-list-item-subtitle
-              >
-            </v-list-item-content>
-          </v-list-item>
-
-          <v-card-text>
-            <v-row align="center">
-              <v-col class="text-h2" cols="8">
-                {{ estacion.Temp }}&deg;C
-              </v-col>
-              <v-col cols="4">
-                <v-img
-                  v-if="
-                    estacion.Estado === 'Nublado' ||
-                    estacion.Estado === 'Escasa nubosidad' ||
-                    estacion.Estado === 'Nubosidad parcial' ||
-                    estacion.Estado === 'Cubierto'
-                  "
-                  src="https://cdn-icons-png.flaticon.com/512/1140/1140045.png"
-                  alt="Sunny image"
-                  width="100%"
-                ></v-img>
-                <v-img
-                  v-else
-                  src="https://cdn-icons-png.flaticon.com/512/890/890347.png"
-                  alt="Sunny image"
-                  width="100%"
-                ></v-img>
-              </v-col>
-            </v-row>
-          </v-card-text>
-
-          <v-list-item>
-            <v-list-item-icon> Humedad </v-list-item-icon>
-            <v-list-item-subtitle>{{ estacion.Humedad }}</v-list-item-subtitle>
-          </v-list-item>
-          <v-divider></v-divider>
-          <v-card-actions>
-            <v-btn text> Full Report </v-btn>
-          </v-card-actions>
-        </v-card>
+        <ClimaApi />
       </v-col>
     </v-row>
     <v-dialog v-model="dialog" width="500">
@@ -148,10 +109,10 @@
 
       <v-card>
         <v-card-title class="text-h5 red text-error white--text" dark>
-          ¡¡¡Error!!!
+          Error
         </v-card-title>
 
-        <v-card-text>
+        <v-card-text class="py-3">
           ¡Debes crear una cuenta o iniciar sesión para agregar un evento!
         </v-card-text>
 
@@ -168,24 +129,17 @@
 
 <script>
 import Carousel from "@/components/Carousel.vue";
-import GoogleMap from "@/components/GoogleMap.vue";
-import axios from "axios";
+import ClimaApi from "@/components/ClimaApi.vue";
 import { mapActions, mapState } from "vuex";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase";
 
 export default {
   name: "Home",
-  components: { Carousel, GoogleMap },
+  components: { Carousel, ClimaApi },
   created() {
-    axios
-      .get("https://api.gael.cloud/general/public/clima/SCFA")
-      .then(({ data }) => {
-        this.estacion = data;
-      })
-      .catch((e) => console.log(e));
-
     this.get_eventos();
+    this.eventosFiltrados = this.eventos;
 
     onAuthStateChanged(auth, (user) => {
       console.log(user);
@@ -194,8 +148,9 @@ export default {
   },
   data() {
     return {
-      estacion: [],
       dialog: false,
+      texto: "",
+      eventosFiltrados: [],
     };
   },
   methods: {
@@ -211,6 +166,23 @@ export default {
   },
   computed: {
     ...mapState(["eventos"]),
+    filtro: {
+      get() {
+        return this.texto
+      },
+      set(value) {
+        value = value.toLowerCase();
+        this.eventosFiltrados = this.eventos.filter(
+          item => item.texto.toLowerCase().indexOf(value) !== -1
+          )
+        this.texto = value;
+      }
+    },
+     filtroEvento() {
+      console.log(this.texto)
+      return this.eventos.filter(item => (
+        item => item.nombre.toLowerCase().indexOf(this.texto.toLowerCase()) !== -1))
+    }
   },
 };
 </script>

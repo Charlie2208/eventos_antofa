@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { addDoc, collection, deleteDoc, doc, onSnapshot, query, updateDoc } from '@firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, onSnapshot, query, updateDoc, orderBy, Timestamp } from '@firebase/firestore';
 import { auth, db } from '../firebase';
 
 
@@ -8,25 +8,27 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    eventos: []
+    eventos: [],
   },
   mutations: {
     GET_EVENTOS(state, payload) {
       state.eventos = payload
     },
   },
-  actions: {
+  actions: { 
     async get_eventos({ commit }) {
       try {
         const q = query(
-          collection(db, "eventos"),
+          collection(db, "eventos"),orderBy("fechaDb", "desc")
         );
         onSnapshot(q, (querySnapshot) => {
           const eventos = [];
           querySnapshot.forEach((doc) => {
             eventos.push({
               id: doc.id,
+              uid: doc.uid,
               ...doc.data(),
+              
             });
           });
           commit("GET_EVENTOS", eventos);
@@ -39,6 +41,7 @@ export default new Vuex.Store({
       try {
         await addDoc(collection(db, "eventos",), {
           nombre: evento.nombre,
+          categoria: evento.categoria,
           descripcion: evento.descripcion,
           direccion: evento.direccion,
           fecha: evento.fecha,
@@ -46,6 +49,7 @@ export default new Vuex.Store({
           lugar: evento.lugar,
           src: evento.src,
           uid: auth.currentUser.uid,
+          fechaDb: Timestamp.fromDate(new Date(evento.date)),
         });
       } catch (error) {
         console.log(error)
@@ -64,6 +68,7 @@ export default new Vuex.Store({
         const docRef = doc(db, "eventos", evento.id);
         await updateDoc(docRef, {
           nombre: evento.nombre,
+          categoria: evento.categoria,
           descripcion: evento.descripcion,
           direccion: evento.direccion,
           fecha: evento.fecha,

@@ -3,7 +3,7 @@
     <h1 class="text-center h-1">Iniciar Sesión</h1>
     <v-form v-model="valid" ref="formRegister">
       <v-row justify="center">
-        <v-col cols="8" md="4">
+        <v-col cols="8" md="8">
           <v-text-field
             v-model="user.email"
             label="Email"
@@ -21,12 +21,12 @@
           ></v-text-field>
           <v-btn
             color="primary"
-            class="mr-2"
+            class="mr-2 mt-2"
             :disabled="!valid"
             @click="loginUser"
             >Iniciar Sesión</v-btn
           >
-          <v-btn color="error" @click="reset">Resetear</v-btn>
+          <v-btn color="error" class="mt-2" @click="sendMailResetPassword">Olvidé mi contraseña</v-btn>
         </v-col>
       </v-row>
     </v-form>
@@ -35,11 +35,11 @@
         <template v-slot:activator="{}"> </template>
 
         <v-card>
-          <v-card-title class="text-h5 red text-error" dark>
-            Error!!!
+          <v-card-title class="text-h5 red text-error white--text" dark>
+            Error
           </v-card-title>
 
-          <v-card-text>
+          <v-card-text class="py-3">
             La contraseña es incorrecta, por favor ingrésela nuevamente
           </v-card-text>
 
@@ -54,12 +54,44 @@
         </v-card>
       </v-dialog>
     </div>
+    <v-dialog v-model="dialogSendPasword" max-width="400">
+      <v-card>
+        <v-card-title class="text-h5"> Cambio de contraseña exitoso </v-card-title>
+
+        <v-card-text> Se ha enviado un correo para restablecer su contraseña </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn color="green darken-1" text @click="dialogSendPasword = false" >
+            Aceptar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialogUserNotFound" max-width="400">
+      <v-card>
+        <v-card-title class="text-h5"> El usuario no existe </v-card-title>
+
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn color="green darken-1" text @click="dialogUserNotFound = false" >
+            Aceptar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
 <script>
 import { auth } from "@/firebase";
-import { signInWithEmailAndPassword } from "@firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+} from "@firebase/auth";
 
 export default {
   data() {
@@ -70,6 +102,8 @@ export default {
         password: "",
       },
       dialog: false,
+      dialogUserNotFound: false,
+      dialogSendPasword: false,
       show1: false,
       emailRules: [
         (v) => (v && !!v.trim()) || "Escribe algo, no espacios!",
@@ -89,35 +123,47 @@ export default {
       signInWithEmailAndPassword(auth, this.user.email, this.user.password)
         .then((userCredential) => {
           console.log(userCredential);
-          this.$router.push({ name: 'home' })
+          this.$router.push({ name: "home" });
         })
         .catch((error) => {
           console.log(error);
+          if(error.code === 'auth/user-not-found'){
+            this.dialogUserNotFound = true;
+          }else
           this.dialog = true;
         });
     },
-    reset() {
-      console.log("reset...");
-      this.$refs.formRegister.reset();
+    sendMailResetPassword() {
+      this.dialogSendPasword = true;
+      sendPasswordResetEmail(auth, this.user.email)
+        .then(() => {
+          // Password reset email sent!
+          // ..
+        })
+        .catch((error) => {
+          console.log(error)
+        });
     },
   },
 };
 </script>
 <style>
-
-
 #fondo-animado {
-  background: linear-gradient(45deg,#bcddf8, #ffffff, #4aadff);
+  background: linear-gradient(45deg, #bcddf8, #ffffff, #4aadff);
   background-size: 400% 400%;
   position: relative;
   animation: cambiar 10s ease-in-out infinite;
-
 }
 
 @keyframes cambiar {
-  0%{background-position: 0 50%;}
-  50%{background-position: 100% 50%;}
-  100%{background-position: 0 50%;}
+  0% {
+    background-position: 0 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
 }
-
 </style>

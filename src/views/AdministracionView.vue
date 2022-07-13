@@ -5,14 +5,16 @@
         this.user.email
       }}</span>
       <v-spacer></v-spacer>
-      <v-btn class="mx-5" color="blue darken-1" dark @click="activarAddEvento">Agregar Nuevo Evento</v-btn>
+      <v-btn class="mx-5" color="blue darken-1" dark @click="activarAddEvento"
+        >Agregar Nuevo Evento</v-btn
+      >
     </v-row>
-    <v-row justify="center">
+    <v-row justify="center" v-if="filtrarUsuario.length > 0">
       <v-subheader>Administración de eventos</v-subheader>
 
       <v-expansion-panels popout>
         <v-expansion-panel
-          v-for="(message, i) in eventos"
+          v-for="(message, i) in filtrarUsuario"
           :key="i"
           hide-actions
         >
@@ -54,11 +56,17 @@
             </v-card-text>
             <v-card-text class="text--primary text-center">
               <td class="text-center">
-                <v-btn class="mx-2 white--text" color="blue" @click="activarUpdate(message)"
+                <v-btn
+                  class="mx-2 white--text"
+                  color="blue"
+                  @click="activarUpdate(message)"
                   >Editar
                   <v-icon class="mr-2"> mdi-pencil </v-icon>
                 </v-btn>
-                <v-btn class="mx-2 white--text" color="red" @click="deleteItem(message.id)"
+                <v-btn
+                  class="mx-2 white--text"
+                  color="red"
+                  @click="deleteItem(message.id)"
                   >Eliminar
                   <v-icon> mdi-delete </v-icon>
                 </v-btn>
@@ -67,6 +75,11 @@
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
+    </v-row>
+    <v-row v-else justify="center">
+      <v-alert border="bottom" color="pink darken-1" dark>
+        Aún no has agregado un evento
+      </v-alert>
     </v-row>
     <v-dialog v-model="dialogAdd">
       <v-card>
@@ -82,6 +95,14 @@
                     :rules="nameRules"
                     v-model="evento.nombre"
                   />
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-select
+                    :items="items"
+                    :menu-props="{ top: true, offsetY: true }"
+                    label="Categorías"
+                    v-model="evento.categoria"
+                  ></v-select>
                 </v-col>
                 <v-col cols="12" md="6">
                   <v-text-field
@@ -167,6 +188,14 @@
                   />
                 </v-col>
                 <v-col cols="12" md="6">
+                  <v-select
+                    :items="items"
+                    :menu-props="{ top: true, offsetY: true }"
+                    label="Categorías"
+                    v-model="evento.categoria"
+                  ></v-select>
+                </v-col>
+                <v-col cols="12" md="6">
                   <v-text-field
                     required
                     label="Lugar"
@@ -241,32 +270,23 @@
           <v-btn color="blue darken-1" text @click="closeDelete"
             >Cancelar</v-btn
           >
-          <v-btn color="blue darken-1" text @click="deleteEventoItems">Si</v-btn>
+          <v-btn color="blue darken-1" text @click="deleteEventoItems"
+            >Si</v-btn
+          >
           <v-spacer></v-spacer>
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog
-      v-model="dialog"
-      max-width="400"
-    >
+    <v-dialog v-model="dialog" max-width="400">
       <v-card>
-        <v-card-title class="text-h5">
-          Evento creado con éxito
-        </v-card-title>
+        <v-card-title class="text-h5"> Evento creado con éxito </v-card-title>
 
-        <v-card-text>
-          Para ver el evento el evento pulsa el botón
-        </v-card-text>
+        <v-card-text> Para ver el evento el evento pulsa el botón </v-card-text>
 
         <v-card-actions>
           <v-spacer></v-spacer>
 
-          <v-btn
-            color="green darken-1"
-            text
-            @click="pushHome"
-          >
+          <v-btn color="green darken-1" text @click="pushHome">
             Cerrar alerta
           </v-btn>
         </v-card-actions>
@@ -280,9 +300,10 @@ import { mapActions, mapState } from "vuex";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase";
 export default {
-  data () {
+  data() {
     return {
-        evento: {
+      eventosUsuario: [],
+      evento: {
         nombre: "",
         src: "",
         descripcion: "",
@@ -291,12 +312,13 @@ export default {
         direccion: "",
         hora: "",
       },
-    user: null,
-    dialog: false,
-    dialogAdd: false,
-    dialogDelete: false,
-    dialogUpdate: false,
-    nameRules: [
+      items: ["Música", "Teatro", "Cine", "Literatura", "Otro"],
+      user: null,
+      dialog: false,
+      dialogAdd: false,
+      dialogDelete: false,
+      dialogUpdate: false,
+      nameRules: [
         (v) => (v && !!v.trim()) || "Escribe algo, no espacios!",
         (v) => !!v || "No existe",
       ],
@@ -310,7 +332,14 @@ export default {
           /^(ftp|http|https):\/\/[^ "]+$/.test(v) ||
           "Formato de link incorrecto",
       ],
-      }
+    };
+  },
+  async mounted() {
+    if (this.eventos.length === 0) {
+      await this.get_eventos();
+      console.log("se solicitó evento");
+      return;
+    }
   },
   methods: {
     ...mapActions([
@@ -319,10 +348,10 @@ export default {
       "update_evento",
       "get_eventos",
     ]),
-    pushHome(){
-          this.$router.push("/")
-          this.dialog = false;
-      },
+    pushHome() {
+      this.$router.push("/");
+      this.dialog = false;
+    },
     activarAddEvento() {
       this.dialogAdd = true;
     },
@@ -331,24 +360,24 @@ export default {
       this.dialog = true;
     },
     deleteItem(id) {
-        this.deleteEventoId = id;
-        this.dialogDelete = true;
+      this.deleteEventoId = id;
+      this.dialogDelete = true;
     },
     closeDelete() {
-        this.dialogDelete = false;
+      this.dialogDelete = false;
     },
     deleteEventoItems() {
-        this.delete_evento(this.deleteEventoId);
-        this.dialogDelete = false;
+      this.delete_evento(this.deleteEventoId);
+      this.dialogDelete = false;
     },
     activarUpdate(item) {
-        this.dialogUpdate = true;
-        this.evento = item
+      this.dialogUpdate = true;
+      this.evento = item;
     },
-    updateEventoForm(){
-        this.update_evento({ ...this.evento});
-        this.evento = {};
-        this.dialogUpdate = false;
+    updateEventoForm() {
+      this.update_evento({ ...this.evento });
+      this.evento = {};
+      this.dialogUpdate = false;
     },
 
     reset() {
@@ -357,6 +386,11 @@ export default {
   },
   computed: {
     ...mapState(["eventos"]),
+    filtrarUsuario() {
+      const { uid } = this.$route.params;
+      this.eventosUsuario = this.eventos.filter((item) => item.uid === uid);
+      return this.eventosUsuario;
+    },
   },
   created() {
     onAuthStateChanged(auth, (user) => {
