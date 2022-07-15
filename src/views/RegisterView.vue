@@ -87,7 +87,7 @@
 </template>
 
 <script>
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../firebase";
 
 export default {
@@ -132,6 +132,9 @@ export default {
         );
         this.dialog = true;
         console.log(userCredential);
+        updateProfile(auth.currentUser, {
+          displayName: this.user.name,
+        });
       } catch (error) {
         console.log(error);
         if (error.code === 'auth/email-already-in-use'){

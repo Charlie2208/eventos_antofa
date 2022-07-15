@@ -49,13 +49,39 @@
             ></v-text-field>
           </v-col>
           <v-col cols="12" md="6">
-            <v-text-field
-              required
-              label="Fecha"
-              hint="Ejemplo: 22-05-22"
-              :rules="dateRules"
-              v-model="evento.fecha"
-            />
+            <v-menu
+              ref="menu"
+              v-model="menu"
+              :close-on-content-click="false"
+              :return-value.sync="evento.date"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="evento.date"
+                  label="Presiona para seleccionar fecha"
+                  prepend-icon="mdi-calendar"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker v-model="evento.date" no-title scrollable>
+                <v-spacer></v-spacer>
+                <v-btn text color="primary" @click="menu = false">
+                  Cancel
+                </v-btn>
+                <v-btn
+                  text
+                  color="primary"
+                  @click="$refs.menu.save(evento.date)"
+                >
+                  OK
+                </v-btn>
+              </v-date-picker>
+            </v-menu>
           </v-col>
           <v-col cols="12" md="6">
             <v-text-field
@@ -73,52 +99,6 @@
               </template>
             </v-textarea>
           </v-col>
-          <v-col
-      cols="12"
-      md="6"
-    >
-      <v-menu
-        ref="menu"
-        v-model="menu"
-        :close-on-content-click="false"
-        :return-value.sync="evento.date"
-        transition="scale-transition"
-        offset-y
-        min-width="auto"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-text-field
-            v-model="evento.date"
-            label="Picker in menu"
-            prepend-icon="mdi-calendar"
-            readonly
-            v-bind="attrs"
-            v-on="on"
-          ></v-text-field>
-        </template>
-        <v-date-picker
-          v-model="evento.date"
-          no-title
-          scrollable
-        >
-          <v-spacer></v-spacer>
-          <v-btn
-            text
-            color="primary"
-            @click="menu = false"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-            text
-            color="primary"
-            @click="$refs.menu.save(evento.date)"
-          >
-            OK
-          </v-btn>
-        </v-date-picker>
-      </v-menu>
-    </v-col>
         </v-row>
         <v-btn color="green darken-2" class="mr-4" dark @click="addEventoForm"
           >Agregar Evento</v-btn
@@ -148,6 +128,7 @@
 </template>
 
 <script>
+
 import { mapActions, mapState } from "vuex";
 
 export default {
@@ -162,8 +143,12 @@ export default {
         lugar: "",
         direccion: "",
         hora: "",
-        date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+        date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+          .toISOString()
+          .substr(0, 10),
       },
+      imagenes:[],
+      imagen: null,
       menu: false,
       modal: false,
       menu2: false,

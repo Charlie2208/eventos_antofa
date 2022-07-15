@@ -74,7 +74,8 @@ export default new Vuex.Store({
           fecha: evento.fecha,
           hora: evento.hora,
           lugar: evento.lugar,
-          src: evento.src
+          src: evento.src,
+          fechaDb: Timestamp.fromDate(new Date(evento.date)),
         });
       } catch (error) {
         console.log(error);

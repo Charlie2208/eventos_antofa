@@ -75,13 +75,26 @@
 
                 <div>Dirección: {{ evento.direccion }}</div>
 
-                <div>Fecha: {{ evento.fechaDb }}</div>
+                <div>Fecha: {{ formatearFecha(evento.fechaDb) }}</div>
 
                 <div>Hora: {{ evento.hora }}</div>
               </v-card-text>
 
               <v-card-actions>
-                <v-btn color="orange" text> Compartir </v-btn>
+                <v-btn text>
+                  <ShareNetwork
+                    network="facebook"
+                    :url="`http://192.168.0.71:8080/evento/${evento.id}`"
+                    :title="`${evento.nombre}`"
+                    :description="`${evento.descripcion}`"
+                    quote="The hot reload is so fast it\'s near instant. - Evan You"
+                    hashtags="EventosAntofa,vite"
+                    class="links_eventosCategorias"
+                    
+                  >
+                    Compartir <v-icon>mdi-facebook</v-icon>
+                  </ShareNetwork>
+                </v-btn>
                 <v-btn color="orange" text :to="`/evento/${evento.id}`">
                   Ver Más
                 </v-btn>
@@ -128,6 +141,7 @@
 </template>
 
 <script>
+import moment from "moment";
 import Carousel from "@/components/Carousel.vue";
 import ClimaApi from "@/components/ClimaApi.vue";
 import { mapActions, mapState } from "vuex";
@@ -163,26 +177,19 @@ export default {
         this.dialog = true;
       }
     },
+    formatearFecha(fecha) {
+      return moment(fecha.toDate().toDateString()).format("DD/MM/YYYY");
+    },
   },
   computed: {
     ...mapState(["eventos"]),
-    filtro: {
-      get() {
-        return this.texto
-      },
-      set(value) {
-        value = value.toLowerCase();
-        this.eventosFiltrados = this.eventos.filter(
-          item => item.texto.toLowerCase().indexOf(value) !== -1
-          )
-        this.texto = value;
-      }
+    filtroEvento() {
+      console.log(this.texto);
+      return this.eventos.filter(
+        (item) =>
+          item.nombre.toLowerCase().indexOf(this.texto.toLowerCase()) !== -1
+      );
     },
-     filtroEvento() {
-      console.log(this.texto)
-      return this.eventos.filter(item => (
-        item => item.nombre.toLowerCase().indexOf(this.texto.toLowerCase()) !== -1))
-    }
   },
 };
 </script>

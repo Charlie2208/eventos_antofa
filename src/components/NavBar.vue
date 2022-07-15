@@ -69,7 +69,7 @@
             </v-list-item-icon>
             <v-list-item-title>Cerrar Sesión</v-list-item-title>
           </v-list-item>
-          <v-list-item v-if="user" >
+          <v-list-item v-if="user" :to="`/miseventos/${user.uid}`">
             <v-list-item-icon>
               <v-icon>mdi-cloud</v-icon>
             </v-list-item-icon>

@@ -1,7 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore'
-// import { storage } from "firebase/storage";
+import { getStorage } from 'firebase/storage'
+
 
 const firebaseConfig = {
     apiKey: "AIzaSyAnS2f0Fo6-hTmFGFdoWCk5ZDr4fx3g0JA",
@@ -17,10 +18,14 @@ const auth = getAuth(app);
 auth.languageCode = 'es';
 const db = getFirestore(app);
 
+
 const currentUserPromise = () => new Promise((resolve, reject) => {
     onAuthStateChanged(auth, user => {
         resolve(user)
     }, e => reject(e))
 })
 
-export { app, auth, currentUserPromise, db };
+const storage = getStorage(app)
+
+
+export { app, auth, currentUserPromise, db, storage };

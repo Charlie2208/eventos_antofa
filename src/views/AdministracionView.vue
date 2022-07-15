@@ -1,9 +1,9 @@
 <template>
   <v-container fluid>
     <v-row wrap class="py-5">
-      <span class="ml-5" color="primary" v-if="user !== null">{{
-        this.user.email
-      }}</span>
+      <span class="ml-5" color="primary" v-if="user !== null"
+        >Hola, {{ this.user.displayName }}
+      </span>
       <v-spacer></v-spacer>
       <v-btn class="mx-5" color="blue darken-1" dark @click="activarAddEvento"
         >Agregar Nuevo Evento</v-btn
@@ -53,6 +53,7 @@
               <div>Dirección: {{ message.direccion }}</div>
 
               <div>Hora: {{ message.hora }}</div>
+              <div>Fecha: {{ formatearFecha(message.fechaDb) }}</div>
             </v-card-text>
             <v-card-text class="text--primary text-center">
               <td class="text-center">
@@ -77,9 +78,11 @@
       </v-expansion-panels>
     </v-row>
     <v-row v-else justify="center">
-      <v-alert border="bottom" color="pink darken-1" dark>
-        Aún no has agregado un evento
-      </v-alert>
+      <v-col>
+        <v-alert border="bottom" color="red" class="text-center" dark>
+          Aún no has agregado un evento
+        </v-alert>
+      </v-col>
     </v-row>
     <v-dialog v-model="dialogAdd">
       <v-card>
@@ -132,13 +135,39 @@
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <v-text-field
-                    required
-                    label="Fecha"
-                    hint="Ejemplo: 22-05-22"
-                    :rules="dateRules"
-                    v-model="evento.fecha"
-                  />
+                  <v-menu
+                    ref="menu"
+                    v-model="menu"
+                    :close-on-content-click="false"
+                    :return-value.sync="evento.date"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field
+                        v-model="evento.date"
+                        label="Presiona para seleccionar fecha"
+                        prepend-icon="mdi-calendar"
+                        readonly
+                        v-bind="attrs"
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker v-model="evento.date" no-title scrollable>
+                      <v-spacer></v-spacer>
+                      <v-btn text color="primary" @click="menu = false">
+                        Cancel
+                      </v-btn>
+                      <v-btn
+                        text
+                        color="primary"
+                        @click="$refs.menu.save(evento.date)"
+                      >
+                        OK
+                      </v-btn>
+                    </v-date-picker>
+                  </v-menu>
                 </v-col>
                 <v-col cols="12" md="6">
                   <v-text-field
@@ -223,13 +252,39 @@
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <v-text-field
-                    required
-                    label="Fecha"
-                    hint="Ejemplo: 22-05-22"
-                    :rules="dateRules"
-                    v-model="evento.fecha"
-                  />
+                  <v-menu
+                    ref="menu1"
+                    v-model="menu1"
+                    :close-on-content-click="false"
+                    :return-value.sync="evento.date"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field
+                        v-model="evento.date"
+                        label="Presiona para seleccionar fecha"
+                        prepend-icon="mdi-calendar"
+                        readonly
+                        v-bind="attrs"
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker v-model="evento.date" no-title scrollable>
+                      <v-spacer></v-spacer>
+                      <v-btn text color="primary" @click="menu1 = false">
+                        Cancel
+                      </v-btn>
+                      <v-btn
+                        text
+                        color="primary"
+                        @click="$refs.menu1.save(evento.date)"
+                      >
+                        OK
+                      </v-btn>
+                    </v-date-picker>
+                  </v-menu>
                 </v-col>
                 <v-col cols="12" md="6">
                   <v-text-field
@@ -296,6 +351,7 @@
 </template>
 
 <script>
+import moment from "moment"
 import { mapActions, mapState } from "vuex";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase";
@@ -311,9 +367,15 @@ export default {
         lugar: "",
         direccion: "",
         hora: "",
+        date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+          .toISOString()
+          .substr(0, 10),
       },
       items: ["Música", "Teatro", "Cine", "Literatura", "Otro"],
       user: null,
+      menu: false,
+      menu1: false,
+      modal: false,
       dialog: false,
       dialogAdd: false,
       dialogDelete: false,
@@ -383,6 +445,9 @@ export default {
     reset() {
       this.$refs.formEventos.reset();
     },
+    formatearFecha(fecha) {
+      return moment(fecha.toDate().toDateString()).format("DD/MM/YYYY");    
+    } 
   },
   computed: {
     ...mapState(["eventos"]),
