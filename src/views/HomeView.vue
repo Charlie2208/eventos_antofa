@@ -9,7 +9,7 @@
             </v-btn>
           </template>
           <v-list>
-            <v-list-item v-for="(item, index) in eventos" :key="index">
+            <v-list-item v-for="(item, index) in remove_duplicates(eventos)" :key="index">
               <router-link
                 :to="`/eventos/${item.categoria}`"
                 flat
@@ -51,7 +51,7 @@
             cols="12"
             sm="6"
             md="6"
-            v-for="(evento, i) in filtroEvento"
+            v-for="(evento, i) in filtroEvento.slice(0,6)"
             :key="i"
           >
             <v-card class="mx-auto" max-width="400">
@@ -75,7 +75,7 @@
 
                 <div>Dirección: {{ evento.direccion }}</div>
 
-                <div>Fecha: {{ formatearFecha(evento.fechaDb) }}</div>
+                <div>Fecha: {{ formatDate(evento.fechaDb) }}</div>
 
                 <div>Hora: {{ evento.hora }}</div>
               </v-card-text>
@@ -104,7 +104,6 @@
         </v-row>
       </v-col>
       <v-col cols="12" md="4" class="d-none d-md-block">
-        <!-- <h2 class="font-weight-medium">Lista Antofa Music</h2> -->
         <iframe
           style="border-radius: 12px"
           src="https://open.spotify.com/embed/playlist/4Sim8snGbus9RZ913b2kyM?utm_source=generator&theme=0"
@@ -153,7 +152,6 @@ export default {
   components: { Carousel, ClimaApi },
   created() {
     this.get_eventos();
-    this.eventosFiltrados = this.eventos;
 
     onAuthStateChanged(auth, (user) => {
       console.log(user);
@@ -177,14 +175,19 @@ export default {
         this.dialog = true;
       }
     },
-    formatearFecha(fecha) {
+    formatDate(fecha) {
       return moment(fecha.toDate().toDateString()).format("DD/MM/YYYY");
     },
+    remove_duplicates(arreglo) {
+    let no_duplicate = arreglo.filter((objeto, index, self) =>
+     index === self.findIndex((t) => (t.categoria == objeto.categoria
+    )));
+    return no_duplicate 
+  },
   },
   computed: {
     ...mapState(["eventos"]),
     filtroEvento() {
-      console.log(this.texto);
       return this.eventos.filter(
         (item) =>
           item.nombre.toLowerCase().indexOf(this.texto.toLowerCase()) !== -1
