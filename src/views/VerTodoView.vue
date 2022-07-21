@@ -17,11 +17,11 @@
                 </v-avatar>
               </v-col>
 
-              <v-col class="hidden-xs-only" sm="5" md="3">
+              <v-col class="" cols="5" sm="3">
                 <strong v-html="message.nombre"></strong>
               </v-col>
 
-              <v-col class="text-no-wrap" cols="5" sm="3">
+              <v-col class="text-no-wrap hidden-xs-only" cols="5" sm="3">
                 <v-chip
                   v-if="message.direccion"
                   :color="`${message.color} lighten-4`"
@@ -30,6 +30,16 @@
                   small
                 >
                   Lugar: {{ message.lugar }}
+                </v-chip>
+
+                <v-chip
+                  v-if="message.direccion"
+                  :color="`${message.color} lighten-4`"
+                  class="ml-0 mr-2 black--text"
+                  label
+                  small
+                >
+                  Fecha: {{ formatDate(message.fechaDb) }}
                 </v-chip>
               </v-col>
             </v-row>
@@ -42,6 +52,7 @@
               <div>Lugar: {{ message.lugar }}</div>
 
               <div>Dirección: {{ message.direccion }}</div>
+              <div>Fecha: {{ formatDate(message.fechaDb) }}</div>
 
               <div>Hora: {{ message.hora }}</div>
             </v-card-text>
@@ -54,6 +65,7 @@
 </template>
 
 <script>
+import moment from "moment";
 import { mapState } from "vuex";
 export default {
   data () {
@@ -68,6 +80,11 @@ export default {
         hora: "",
       },
       }
+  },
+  methods: {
+    formatDate(fecha) {
+      return moment(fecha.toDate().toDateString()).format("DD/MM/YYYY");
+    },
   },
   computed: {
     ...mapState(["eventos"]),

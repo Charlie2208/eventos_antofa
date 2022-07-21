@@ -23,7 +23,13 @@ que quieran una plataforma para mostrar sus espectáculos</p>
 <strong>colores</strong>: primary lightn -2 Footer, blue Navbar.
 <br>
 
-
+### Auth User
+```
+Para ingresar se puede usar el siguiente usuario de prueba:
+andres@test.com password: 123123
+```
+### Enlace de video
+<a href="https://drive.google.com/file/d/1r8e9woqw4W_3H03ndbfTwxdfrgsUBHkZ/view?usp=sharing">Enlace Video</a>
 ### Project setup
 ```
 npm install

@@ -15,11 +15,11 @@ export default new Vuex.Store({
       state.eventos = payload
     },
   },
-  actions: { 
+  actions: {
     async get_eventos({ commit }) {
       try {
         const q = query(
-          collection(db, "eventos"),orderBy("fechaDb", "desc")
+          collection(db, "eventos"), orderBy("fechaDb",)
         );
         onSnapshot(q, (querySnapshot) => {
           const eventos = [];
@@ -28,7 +28,7 @@ export default new Vuex.Store({
               id: doc.id,
               uid: doc.uid,
               ...doc.data(),
-              
+
             });
           });
           commit("GET_EVENTOS", eventos);
@@ -44,7 +44,6 @@ export default new Vuex.Store({
           categoria: evento.categoria,
           descripcion: evento.descripcion,
           direccion: evento.direccion,
-          fecha: evento.fecha,
           hora: evento.hora,
           lugar: evento.lugar,
           src: evento.src,
@@ -71,11 +70,9 @@ export default new Vuex.Store({
           categoria: evento.categoria,
           descripcion: evento.descripcion,
           direccion: evento.direccion,
-          fecha: evento.fecha,
           hora: evento.hora,
           lugar: evento.lugar,
           src: evento.src,
-          fechaDb: Timestamp.fromDate(new Date(evento.date)),
         });
       } catch (error) {
         console.log(error);

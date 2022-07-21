@@ -9,7 +9,10 @@
             </v-btn>
           </template>
           <v-list>
-            <v-list-item v-for="(item, index) in remove_duplicates(eventos)" :key="index">
+            <v-list-item
+              v-for="(item, index) in remove_duplicates(eventos)"
+              :key="index"
+            >
               <router-link
                 :to="`/eventos/${item.categoria}`"
                 flat
@@ -51,7 +54,7 @@
             cols="12"
             sm="6"
             md="6"
-            v-for="(evento, i) in filtroEvento.slice(0,6)"
+            v-for="(evento, i) in filtroEvento.slice(0, 6)"
             :key="i"
           >
             <v-card class="mx-auto" max-width="400">
@@ -68,7 +71,7 @@
               </v-card-subtitle>
 
               <v-card-text class="text--primary">
-                <div>{{ evento.descripcion }}</div>
+                <div>{{ cortarString(evento.descripcion) }}...</div>
               </v-card-text>
               <v-card-text class="text--primary">
                 <div>Lugar: {{ evento.lugar }}</div>
@@ -81,20 +84,76 @@
               </v-card-text>
 
               <v-card-actions>
-                <v-btn text>
-                  <ShareNetwork
-                    network="facebook"
-                    :url="`http://192.168.0.71:8080/evento/${evento.id}`"
-                    :title="`${evento.nombre}`"
-                    :description="`${evento.descripcion}`"
-                    quote="The hot reload is so fast it\'s near instant. - Evan You"
-                    hashtags="EventosAntofa,vite"
-                    class="links_eventosCategorias"
-                    
-                  >
-                    Compartir <v-icon>mdi-facebook</v-icon>
-                  </ShareNetwork>
-                </v-btn>
+                <v-row>
+                  <v-col cols="auto">
+                    <v-dialog
+                      transition="dialog-bottom-transition"
+                      max-width="400"
+                    >
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn color="orange" text v-bind="attrs" v-on="on"
+                          >Compartir</v-btn
+                        >
+                      </template>
+                      <template v-slot:default="dialog">
+                        <v-card>
+                          <v-toolbar color="primary" dark class="text-h5"
+                            >Compartir Evento</v-toolbar
+                          >
+                          <v-card-text>
+                            <div class="text-h5 pa-6">
+                              
+                              <v-btn text>
+                                <ShareNetwork
+                                  network="facebook"
+                                  :url="`https://eventos-antofa.web.app/evento/${evento.id}`"
+                                  :title="`${evento.nombre}`"
+                                  :description="`${evento.descripcion}`"
+                                  quote="The hot reload is so fast it\'s near instant. - Evan You"
+                                  hashtags="EventosAntofa,vite"
+                                  class="links_eventosCategorias"
+                                >
+                                  Compartir en Facebook <v-icon>mdi-facebook</v-icon>
+                                </ShareNetwork>
+                              </v-btn>
+                              <v-btn text>
+                                <ShareNetwork
+                                  network="messenger"
+                                  :url="`https://eventos-antofa.web.app/evento/${evento.id}`"
+                                  :title="`${evento.nombre}`"
+                                  :description="`${evento.descripcion}`"
+                                  quote="The hot reload is so fast it\'s near instant. - Evan You"
+                                  hashtags="EventosAntofa,vite"
+                                  class="links_eventosCategorias"
+                                >
+                                  Enviar por Messenger <v-icon>mdi-facebook-messenger</v-icon>
+                                </ShareNetwork>
+                              </v-btn>
+                              <v-btn text color="green">
+                                <ShareNetwork
+                                  network="whatsapp"
+                                  :url="`https://eventos-antofa.web.app/evento/${evento.id}`"
+                                  :title="`${evento.nombre}`"
+                                  :description="`${evento.descripcion}`"
+                                  quote="The hot reload is so fast it\'s near instant. - Evan You"
+                                  hashtags="EventosAntofa,vite"
+                                  class="links_eventosCategorias"
+                                >
+                                  Enviar por Whatsapp <v-icon color="green">mdi-whatsapp</v-icon>
+                                </ShareNetwork>
+                              </v-btn>
+                            </div>
+                          </v-card-text>
+                          <v-card-actions class="justify-end">
+                            <v-btn text color="orange" @click="dialog.value = false"
+                              >Cerrar</v-btn
+                            >
+                          </v-card-actions>
+                        </v-card>
+                      </template>
+                    </v-dialog>
+                  </v-col>
+                </v-row>
                 <v-btn color="orange" text :to="`/evento/${evento.id}`">
                   Ver Más
                 </v-btn>
@@ -141,6 +200,7 @@
 
 <script>
 import moment from "moment";
+import SocialMediaSharing from "@/components/SocialMediaSharing.vue";
 import Carousel from "@/components/Carousel.vue";
 import ClimaApi from "@/components/ClimaApi.vue";
 import { mapActions, mapState } from "vuex";
@@ -149,7 +209,7 @@ import { auth } from "../firebase";
 
 export default {
   name: "Home",
-  components: { Carousel, ClimaApi },
+  components: { Carousel, ClimaApi, SocialMediaSharing },
   created() {
     this.get_eventos();
 
@@ -178,12 +238,16 @@ export default {
     formatDate(fecha) {
       return moment(fecha.toDate().toDateString()).format("DD/MM/YYYY");
     },
+    cortarString(valor) {
+      return valor.slice(0, 80);
+    },
     remove_duplicates(arreglo) {
-    let no_duplicate = arreglo.filter((objeto, index, self) =>
-     index === self.findIndex((t) => (t.categoria == objeto.categoria
-    )));
-    return no_duplicate 
-  },
+      let no_duplicate = arreglo.filter(
+        (objeto, index, self) =>
+          index === self.findIndex((t) => t.categoria == objeto.categoria)
+      );
+      return no_duplicate;
+    },
   },
   computed: {
     ...mapState(["eventos"]),

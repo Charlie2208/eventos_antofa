@@ -1,7 +1,7 @@
 <template>
   <v-carousel cycle height="400">
     <v-carousel-item
-      v-for="(item, i) in eventos"
+      v-for="(item, i) in eventos.slice(0,4)"
       :key="i"
       :src="item.src"
     ></v-carousel-item>

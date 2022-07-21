@@ -42,7 +42,10 @@ const routes = [
   {
     path: '/agregareventos',
     name: 'agregareventos',
-    component: AgregarEventosView
+    component: AgregarEventosView,
+    meta: {
+      auth: true
+    }
   },
   {
     path: '/vertodo',

@@ -57,7 +57,7 @@
             </v-list-item-icon>
             <v-list-item-title>Iniciar Sesión</v-list-item-title>
           </v-list-item>
-          <v-list-item to="/agregareventos">
+          <v-list-item v-if="user" to="/agregareventos">
             <v-list-item-icon>
               <v-icon>mdi-cloud-upload</v-icon>
             </v-list-item-icon>

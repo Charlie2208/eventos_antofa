@@ -9,7 +9,7 @@
     </p>
     <p class="text-justify">Lugar: {{ eventoViewId.lugar }}</p>
     <p class="text-justify">Dirección: {{ eventoViewId.direccion }}</p>
-    <p class="text-justify">Fecha: {{ eventoViewId.fecha }},</p>
+    <p class="text-justify">Fecha: {{ formatDate(eventoViewId.fechaDb) }},</p>
     <p class="text-justify">Hora: {{ eventoViewId.hora }}</p>
 
     <GoogleMap
@@ -24,6 +24,7 @@
 
 
 <script>
+import moment from "moment";
 import { mapState } from "vuex";
 import GoogleMap from "@/components/GoogleMap.vue";
 
@@ -32,6 +33,11 @@ export default {
   components: { GoogleMap },
   data() {
     return {};
+  },
+  methods: {
+    formatDate(fecha) {
+      return moment(fecha.toDate().toDateString()).format("DD/MM/YYYY");
+    },
   },
   computed: {
     ...mapState(["eventos"]),
